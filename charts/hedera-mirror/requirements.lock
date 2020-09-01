@@ -14,5 +14,8 @@ dependencies:
 - name: hedera-mirror-rest
   repository: file://../hedera-mirror-rest
   version: 0.8.0-rc1
+- name: timescaledb-single
+  repository: https://charts.timescale.com
+  version: 0.7.0
 digest: sha256:7a322029b85663ab9d3f07ac6bda278872a1681cc3a6b78d879c80da7277beb6
 generated: "2020-10-21T00:43:28.222189-05:00"
