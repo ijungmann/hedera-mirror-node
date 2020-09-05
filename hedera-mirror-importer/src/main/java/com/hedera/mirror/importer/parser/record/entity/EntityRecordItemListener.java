@@ -224,7 +224,7 @@ public class EntityRecordItemListener implements RecordItemListener {
         }
 
         entityListener.onTransaction(tx);
-        log.debug("Storing transaction: {}", tx);
+        log.trace("Storing transaction: {}", tx);
     }
 
     private Transaction buildTransaction(long consensusTimestamp, RecordItem recordItem) {
