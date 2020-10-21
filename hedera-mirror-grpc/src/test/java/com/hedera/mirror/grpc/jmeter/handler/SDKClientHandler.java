@@ -21,7 +21,6 @@ package com.hedera.mirror.grpc.jmeter.handler;
  */
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +42,6 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.token.TokenId;
-import com.hedera.hashgraph.sdk.token.TokenTransferTransaction;
 import com.hedera.mirror.grpc.jmeter.props.NodeInfo;
 
 @Log4j2
@@ -123,18 +120,6 @@ public class SDKClientHandler {
         return transactionId;
     }
 
-    public TransactionId submitTokenTransfer(TokenId tokenId, AccountId operatorId, AccountId recipientId,
-                                             long transferAmount) throws HederaStatusException {
-        TransactionId transactionId = new TokenTransferTransaction()
-                .addSender(tokenId, operatorId, transferAmount)
-                .addRecipient(tokenId, recipientId, transferAmount)
-                .setMaxTransactionFee(1_000_000)
-                .setTransactionMemo("Token Transfer_" + Instant.now())
-                .execute(client);
-
-        return transactionId;
-    }
-
     public int getValidTransactionsCount(List<TransactionId> transactionIds) {
         log.debug("Verify Transactions {}", transactionIds.size());
         AtomicInteger counter = new AtomicInteger(0);
@@ -154,27 +139,5 @@ public class SDKClientHandler {
 
         log.debug("{} out of {} transactions returned a Success status", counter.get(), transactionIds.size());
         return counter.get();
-    }
-
-    public List<TransactionId> getValidTransactions(List<TransactionId> transactionIds) {
-        log.debug("Verify Transactions {}", transactionIds.size());
-        List<TransactionId> validTransactions = new ArrayList<>();
-        transactionIds.forEach(x -> {
-            TransactionReceipt receipt = null;
-            try {
-                receipt = x.getReceipt(client);
-            } catch (HederaStatusException e) {
-                log.debug("Error pulling {} receipt {}", x, e.getMessage());
-            }
-            if (receipt.status == Status.Success) {
-                validTransactions.add(x);
-            } else {
-                log.warn("Transaction {} had an unexpected status of {}", x, receipt.status);
-            }
-        });
-
-        log.debug("{} out of {} transactions returned a Success status", validTransactions.size(), transactionIds
-                .size());
-        return validTransactions;
     }
 }
